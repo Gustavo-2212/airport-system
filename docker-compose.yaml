@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: server_postgres
+    environment:
+      POSTGRES_USER: gustavo
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: db_comp_aerea
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      rede_docker:
+        ipv4_address: 172.12.0.15
+
+  app:
+    build: ./app/.
+    environment:
+      DB_HOST: 172.12.0.15
+      DB_USER: gustavo
+      DB_PASSWORD: 1234
+      DB_BASE: db_comp_aerea
+    ports:
+      - "5000:5000"
+    networks:
+      rede_docker:
+        ipv4_address: 172.12.0.10
+    depends_on:
+      - postgres
+
+networks:
+  rede_docker:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.12.0.0/16
+
+volumes:
+  pgdata:
+    driver: local
